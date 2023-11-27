@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Button, Menu, MenuItem } from '@mui/material';
 import { useNavigation } from './NavigationContext';
-import { fetchHierarchies } from '../api';  // Make sure this import points to your API fetching logic
+import { fetchHierarchies } from '../api'; // Make sure this import points to your API fetching logic
+import { defaultRegion } from './constants';
 
 const HierarchySwitcher = () => {
-  const { selectedHierarchy, setSelectedHierarchy, setSelectedRegion } = useNavigation();
+  const { selectedHierarchy, setSelectedHierarchy, setSelectedRegion } =
+    useNavigation();
   const [hierarchies, setHierarchies] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -15,7 +17,7 @@ const HierarchySwitcher = () => {
         const hierarchies = await fetchHierarchies();
         setHierarchies(hierarchies);
       } catch (error) {
-        console.error("Error fetching hierarchies:", error);
+        console.error('Error fetching hierarchies:', error);
       }
     };
 
@@ -33,42 +35,37 @@ const HierarchySwitcher = () => {
   const handleHierarchyChange = (hierarchyId) => {
     setSelectedHierarchy({ hierarchyId });
     // Reset the selected region to the world
-    setSelectedRegion({
-        id: null,
-        name: 'World',
-        info: {},
-        hasSubregions: false,
-    });
+    setSelectedRegion(defaultRegion);
     handleClose();
   };
 
   return (
-      <div>
-        <Button
-            aria-controls="hierarchy-menu"
-            aria-haspopup="true"
-            onClick={handleClick}
-        >
-          Switch Hierarchy
-        </Button>
-        <Menu
-            id="hierarchy-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={open}
-            onClose={handleClose}
-        >
-          {hierarchies.map(hierarchy => (
-              <MenuItem
-                  key={hierarchy.hierarchyId}
-                  selected={hierarchy.hierarchyId === selectedHierarchy.hierarchyId}
-                  onClick={() => handleHierarchyChange(hierarchy.hierarchyId)}
-              >
-                {hierarchy.hierarchyName}
-              </MenuItem>
-          ))}
-        </Menu>
-      </div>
+    <div>
+      <Button
+        aria-controls="hierarchy-menu"
+        aria-haspopup="true"
+        onClick={handleClick}
+      >
+        Switch Hierarchy
+      </Button>
+      <Menu
+        id="hierarchy-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={open}
+        onClose={handleClose}
+      >
+        {hierarchies.map((hierarchy) => (
+          <MenuItem
+            key={hierarchy.hierarchyId}
+            selected={hierarchy.hierarchyId === selectedHierarchy.hierarchyId}
+            onClick={() => handleHierarchyChange(hierarchy.hierarchyId)}
+          >
+            {hierarchy.hierarchyName}
+          </MenuItem>
+        ))}
+      </Menu>
+    </div>
   );
 };
 
